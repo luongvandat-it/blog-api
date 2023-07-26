@@ -1,27 +1,35 @@
 version: '3.8'
 services:
-  dev-database:
+  postgres:
     image: postgres:15.0
-    container_name: dev-database
+    container_name: postgres
+    hostname: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sapassword
+      POSTGRES_DB: blogdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - 5433:5432
-    environment:
-      POSTGRES_DB: blogdb
-      POSTGRES_USER: sapassword
-      POSTGRES_PASSWORD: sapassword
-    networks:
-      - blog-network
 
-  test-database:
-    image: postgres:15.0
-    container_name: test-database
-    ports:
-      - 5434:5432
+  nestjs_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-nest-backend
+    restart: always
     environment:
-      POSTGRES_DB: blogdb
-      POSTGRES_USER: sapassword
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: sapassword
-    networks:
-      - blog-network
-networks:
-  blog-network:
+      POSTGRES_DB: blogdb
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

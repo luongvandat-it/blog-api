@@ -8,8 +8,8 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
     constructor(
-        private prismaService: PrismaService, 
-        private jwtService: JwtService, 
+        private prismaService: PrismaService,
+        private jwtService: JwtService,
         private configService: ConfigService
     ) { }
 
@@ -31,7 +31,7 @@ export class AuthService {
             })
             return await this.signJwtToken(user.id, user.email)
         } catch (error) {
-            if(error.code == 'P2002') {
+            if (error.code == 'P2002') {
                 throw new ForbiddenException(
                     'User with this email already exists'
                 )
@@ -50,7 +50,7 @@ export class AuthService {
             throw new ForbiddenException(`User is not valid`)
         }
 
-        const passwordMatched = await argon.verify((await user).hashedPassword, authDTO.password)
+        const passwordMatched = await argon.verify(user.hashedPassword, authDTO.password)
 
         if (!passwordMatched) {
             throw new ForbiddenException(`Email or password wrong`)
